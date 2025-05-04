@@ -4,9 +4,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/godbus/dbus/v5"
 	"reflect"
 	"time"
+
+	"github.com/godbus/dbus/v5"
 )
 
 // Paths of methods and properties of Modem3gpp
@@ -29,6 +30,7 @@ const (
 	Modem3gppPropertyPco                      = Modem3gppInterface + ".Pco"                      // readable   a(ubay)
 	Modem3gppPropertyInitialEpsBearer         = Modem3gppInterface + ".InitialEpsBearer"         // readable   o
 	Modem3gppPropertyInitialEpsBearerSettings = Modem3gppInterface + ".InitialEpsBearerSettings" // readable   a{sv}
+	Modem3gppPropertyPacketServiceState       = Modem3gppInterface + ".PacketServiceState"       // readable   u
 )
 
 // Modem3gpp interface provides access to specific actions that may be performed in modems with 3GPP capabilities.
@@ -104,6 +106,9 @@ type Modem3gpp interface {
 	// The network may decide to use different settings during the actual device attach procedure, e.g. if the device is roaming or no explicit settings were requested, so the properties shown in the org.freedesktop.ModemManager1.Modem.Modem3gpp.InitialEpsBearer:InitialEpsBearer may be totally different.
 	// This is a read-only property, updating these settings should be done using the SetInitialEpsBearerSettings() method.
 	GetInitialEpsBearerSettings() (property BearerProperty, err error)
+
+	// A MMModem3gppPacketServiceState value representing the packet service state, given as an unsigned integer (signature "u").
+	GetPacketServiceState() (MMModem3gppPacketServiceState, error)
 
 	MarshalJSON() ([]byte, error)
 }
@@ -457,6 +462,14 @@ func (m modem3gpp) GetInitialEpsBearerSettings() (property BearerProperty, err e
 	return property, nil
 }
 
+func (m modem3gpp) GetPacketServiceState() (MMModem3gppPacketServiceState, error) {
+	res, err := m.getUint32Property(Modem3gppPropertyPacketServiceState)
+	if err != nil {
+		return MmModem3gppPacketServiceStateUnknown, err
+	}
+	return MMModem3gppPacketServiceState(res), nil
+}
+
 func (m modem3gpp) MarshalJSON() ([]byte, error) {
 	imei, err := m.GetImei()
 	if err != nil {
@@ -502,6 +515,10 @@ func (m modem3gpp) MarshalJSON() ([]byte, error) {
 			fmt.Println(err.Error())
 		}
 	}
+	packetServiceState, err := m.GetPacketServiceState()
+	if err != nil {
+		fmt.Println(err.Error())
+	}
 
 	return json.Marshal(map[string]interface{}{
 		"Imei":                     imei,
@@ -512,5 +529,6 @@ func (m modem3gpp) MarshalJSON() ([]byte, error) {
 		"Pco":                      pco,
 		"InitialEpsBearer":         initialEpsBearerJson,
 		"InitialEpsBearerSettings": initialEpsBearerSettingsJson,
+		"PacketServiceState":       packetServiceState,
 	})
 }

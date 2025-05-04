@@ -970,6 +970,16 @@ const (
 
 )
 
+// MMModem3gppPacketServiceState Packet service state as per 3GPP TS 24.301.
+type MMModem3gppPacketServiceState uint32
+
+//go:generate stringer -type=MMModem3gppPacketServiceState -trimprefix=MmModem3gppPacketServiceState
+const (
+	MmModem3gppPacketServiceStateUnknown  MMModem3gppPacketServiceState = 0 // Unknown packet service state.
+	MmModem3gppPacketServiceStateDetached MMModem3gppPacketServiceState = 1 // Packet service is detached.
+	MmModem3gppPacketServiceStateAttached MMModem3gppPacketServiceState = 2 // Packet service is attached.
+)
+
 // MMFirmwareImageType Type of firmware image.
 type MMFirmwareImageType uint32
 

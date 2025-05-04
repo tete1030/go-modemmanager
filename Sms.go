@@ -4,8 +4,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/godbus/dbus/v5"
 	"time"
+
+	"github.com/godbus/dbus/v5"
 )
 
 // Paths of methods and properties
@@ -252,7 +253,7 @@ func (ss sms) GetTimestamp() (time.Time, error) {
 	if len(res) < 1 {
 		return time.Now(), errors.New("no timestamp available")
 	}
-	t, err := time.Parse(time.RFC3339Nano, res)
+	t, err := parseRFC3399Time(res)
 	if err != nil {
 		return time.Now(), err
 	}
@@ -268,7 +269,7 @@ func (ss sms) GetDischargeTimestamp() (time.Time, error) {
 	if len(res) < 1 {
 		return time.Now(), errors.New("no discharge timestamp available")
 	}
-	t, err := time.Parse(time.RFC3339Nano, res)
+	t, err := parseRFC3399Time(res)
 	if err != nil {
 		return time.Now(), err
 	}

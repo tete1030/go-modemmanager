@@ -4,8 +4,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/godbus/dbus/v5"
 	"time"
+
+	"github.com/godbus/dbus/v5"
 )
 
 // Paths of methods and properties of ModemTime
@@ -74,9 +75,9 @@ type ModemTimeZone struct {
 // MarshalJSON returns a byte array
 func (mtz ModemTimeZone) MarshalJSON() ([]byte, error) {
 	return json.Marshal(map[string]interface{}{
-		"Offset":       mtz.Offset,
-		"DstOffset":    mtz.DstOffset,
-		"LeapSeconds":  mtz.LeapSeconds,
+		"Offset":      mtz.Offset,
+		"DstOffset":   mtz.DstOffset,
+		"LeapSeconds": mtz.LeapSeconds,
 	})
 }
 
@@ -96,10 +97,7 @@ func (ti modemTime) GetNetworkTime() (time.Time, error) {
 	if err != nil {
 		return time.Now(), err
 	}
-	t, err := time.Parse(time.RFC3339Nano, tmpTime)
-	if err != nil {
-		return time.Now(), err
-	}
+	t, err := parseRFC3399Time(tmpTime)
 	return t, err
 }
 
@@ -152,7 +150,7 @@ func (ti modemTime) ParseNetworkTimeChanged(v *dbus.Signal) (networkTime time.Ti
 		err = errors.New("error by parsing time string")
 		return
 	}
-	return time.Parse(time.RFC3339Nano, tmpTime)
+	return parseRFC3399Time(tmpTime)
 }
 
 func (ti modemTime) Unsubscribe() {

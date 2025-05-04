@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
-	"github.com/maltegrosse/go-modemmanager"
 	"log"
 	"time"
+
+	"github.com/tete1030/go-modemmanager"
 )
 
 func main() {
@@ -463,6 +464,12 @@ func main() {
 			log.Fatal(err.Error())
 		}
 		fmt.Println(" - Ussd for: ", ussd.GetObjectPath())
+
+		packetServiceState, err := modem3gpp.GetPacketServiceState()
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+		fmt.Println(" - PacketServiceState: ", packetServiceState)
 
 		fmt.Println("### END 3GPP ####")
 

@@ -27,11 +27,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/godbus/dbus/v5"
 	"net"
 	"reflect"
 	"strings"
 	"time"
+
+	"github.com/godbus/dbus/v5"
 )
 
 const (
@@ -77,8 +78,8 @@ func (p Pair) pairToSlice() []interface{} {
 // MarshalJSON returns a byte array
 func (p Pair) MarshalJSON() ([]byte, error) {
 	return json.Marshal(map[string]interface{}{
-		"Left":   p.GetLeft(),
-		"Right":  p.GetRight(),
+		"Left":  p.GetLeft(),
+		"Right": p.GetRight(),
 	})
 }
 
@@ -588,4 +589,23 @@ func returnString(object interface{}) string {
 		}
 	}
 	return strings.Join(resSlice, ", ")
+}
+
+const (
+	RFC3339NanoNoColon          = "2006-01-02T15:04:05.999999999Z0700"
+	RFC3339NanoNoColonNoMinutes = "2006-01-02T15:04:05.999999999Z07"
+)
+
+func parseRFC3399Time(timeString string) (time.Time, error) {
+	parsed, err := time.Parse(time.RFC3339Nano, timeString)
+	if err != nil {
+		parsed, err = time.Parse(RFC3339NanoNoColon, timeString)
+		if err != nil {
+			parsed, err = time.Parse(RFC3339NanoNoColonNoMinutes, timeString)
+			if err != nil {
+				return time.Now(), err
+			}
+		}
+	}
+	return parsed, nil
 }
